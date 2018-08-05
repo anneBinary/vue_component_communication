@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>组件通信</title>
+</head>
+<body>
+<div id="app">
+    <p>总数：{{total}}</p>
+    <my-component @add = "handleGetTotal"
+                @cut = "handleGetTotal"></my-component>
+</div>
+<h3>使用v-model</h3>
+<div id="Vmodel">
+    <p>总数：{{total}}</p>
+    <model-component v-model="total" ></model-component>
+</div>
+<h6>组件的$emit事件名特殊的input;v-model绑定数据</h6>
+<h3>v-model创建自定义的表单输入组件，进行数据的双向绑定</h3>
+<ul>
+    <ol>接收一个value属性</ol>
+    <ol>在有新的value时触发input事件</ol>
+</ul>
+<div id="custom_input">
+    <p>总数：{{total}}</p>
+    <custom-component v-model="total" ></custom-component>
+    <button @click = "cutnum">-1</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+    Vue.component('my-component',{
+        template: '<div>\n' +
+        '    <button @click = "addnum">+1</button>\n' +
+        '    <button @click = "cutnum">-1</button>\n' +
+        '</div>',
+        data:function () {
+            return {
+                counter:0
+            }
+        },
+        methods:{
+            addnum:function () {
+                this.counter++;
+                this.$emit('add',this.counter)
+            },
+            cutnum:function () {
+                this.counter--;
+                this.$emit('cut',this.counter)
+            }
+        }
+    });
+    Vue.component('model-component',{
+        template: '<div>\n' +
+        '    <button @click = "addnum">+1</button>\n' +
+        '    <button @click = "cutnum">-1</button>\n' +
+        '</div>',
+        data:function () {
+            return {
+                counter:0
+            }
+        },
+        methods:{
+            addnum:function () {
+                this.counter++;
+                this.$emit('input',this.counter)
+            },
+            cutnum:function () {
+                this.counter--;
+                this.$emit('input',this.counter)
+            }
+        }
+    });
+    Vue.component('custom-component',{
+        props:['value'],
+        template:'<input :value = "value" @input = "updateValue">',
+        methods:{
+            updateValue: function (e) {
+                this.$emit('input',e.target.value)
+            }
+        }
+    })
+    var app = new Vue({
+        el:'#app',
+        data:{
+            total:0
+        },
+        methods:{
+            handleGetTotal:function (total) {
+                this.total = total;
+            }
+        }
+    })
+    var Vmodel = new Vue({
+        el:'#Vmodel',
+        data:{
+            total:0
+        }
+    })
+    var custom_input = new Vue({
+        el: '#custom_input',
+        data:{
+            total:0
+        },
+        methods:{
+            cutnum:function () {
+                this.total--;
+            }
+        }
+    })
+</script>
+</body>
+</html>
